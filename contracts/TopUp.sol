@@ -9,7 +9,7 @@ contract TopUp {
     mapping (address => bool) isReceiver;
 
     event Withdrawal(uint indexed amount);
-    event TopUpReceiver(address indexed receiver);
+    event TopUpReceive(address indexed receiver);
 
     error NotEnoughReceivers();
     error ZeroValueForbidden();
@@ -37,7 +37,7 @@ contract TopUp {
         if(!isReceiver[_receiver]) revert NotReceiver();
         if(_receiver.balance >= maxReceiverBalance) revert ReceiverBalanceTooHigh();
 
-        emit TopUpReceiver(_receiver);
+        emit TopUpReceive(_receiver);
         _receiver.transfer(topUpAmount);
     }
 
