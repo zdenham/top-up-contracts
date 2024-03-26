@@ -200,5 +200,11 @@ describe('TopUp', function () {
         .to.emit(topUp, 'DepositReceived')
         .withArgs(withdrawerAddress, depositAmount);
     });
+
+    it('should reflect the public varialbes correctly', async function () {
+      expect(await topUp.withdrawAddress()).to.equal(withdrawerAddress);
+      expect(await topUp.maxReceiverBalance()).to.equal(parseEther('1'));
+      expect(await topUp.topUpAmount()).to.equal(parseEther('0.1'));
+    });
   });
 });
