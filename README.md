@@ -4,7 +4,7 @@ Smart contracts to top up receiver wallet addresses once they get below a certai
 
 ## Motivation
 
-Keeping large balance in custodial relayer accounts is not great security practice. If API keys or private keys are compromised, there is a risk of losing the whole gas sponsorship balance. Also, from tax / liability perspective, it can be preferabe to not receive large lump sum of crypto, but only receive utility tokens as needed to accomplish the task at hand.
+Keeping large balance in custodial relayer accounts is not great security practice. If API keys or private keys are compromised, there is a risk of losing the whole gas sponsorship balance. Also, from tax perspective, it can be preferabe to not receive large lump sum of crypto, but only receive utility tokens as needed to accomplish the task at hand.
 
 This smart contract allows for an automated process to drip funds to relayer wallets from a "paymaster" smart contract which no one owns only once relayer wallets drop below a certain threshold. This simplifies the tax implications and enhances the security of the relayer solution.
 
