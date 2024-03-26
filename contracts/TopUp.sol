@@ -37,6 +37,10 @@ contract TopUp {
         }
     }
 
+    /**
+     * @param _receiver The address of the receiver. Must be eligible to receive top-ups.
+     * @dev eligible receivers are set in the constructor and must have a balance lower than maxReceiverBalance.
+     */
     function topUp(address payable _receiver) public {
         if(!isReceiver[_receiver]) revert NotReceiver();
         if(_receiver.balance >= maxReceiverBalance) revert ReceiverBalanceTooHigh();
