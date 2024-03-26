@@ -14,3 +14,9 @@ This smart contract allows for an automated process to drip funds to relayer wal
 2. **maxReceiverBalance** - if a receiver has a higher balance than this parameter, they cannot receive a top up. This keeps the receiver balances relatively low.
 3. **topUpAmount** - the amount we top up a receiver once they get below the balance
 4. **receiverAddress** - the list of eligible receivers (relayer accounts)
+
+## Tests
+
+1. `pnpm install`
+2. `pnpm hardhat test`
+3. `pnpm hardhat coverage` // should be 100%
