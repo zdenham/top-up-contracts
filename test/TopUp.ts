@@ -56,6 +56,53 @@ describe('TopUp', function () {
   let withdrawerAddress: string;
   let otherAddress: string;
   let receiverAddress: string;
+
+  it('should fail to deploy with a maxReceiverBalance of zero', async function () {
+    const [withdrawer] = await ethers.getSigners();
+    const withdrawerAddress = await withdrawer.getAddress();
+    const maxReceiverBalance = 0;
+    const topUpAmount = parseEther('0.1');
+    const receiverAddress = withdrawerAddress;
+
+    const TopUp = await ethers.getContractFactory('TopUp');
+
+    await expect(
+      TopUp.deploy(withdrawerAddress, maxReceiverBalance, topUpAmount, [
+        receiverAddress,
+      ])
+    ).to.be.revertedWithCustomError(TopUp, 'ZeroValueForbidden');
+  });
+
+  it('should fail to deploy with a topUpAmount of zero', async function () {
+    const [withdrawer] = await ethers.getSigners();
+    const withdrawerAddress = await withdrawer.getAddress();
+    const maxReceiverBalance = parseEther('1');
+    const topUpAmount = 0;
+    const receiverAddress = withdrawerAddress;
+
+    const TopUp = await ethers.getContractFactory('TopUp');
+
+    await expect(
+      TopUp.deploy(withdrawerAddress, maxReceiverBalance, topUpAmount, [
+        receiverAddress,
+      ])
+    ).to.be.revertedWithCustomError(TopUp, 'ZeroValueForbidden');
+  });
+
+  it('should fail to deploy with an empty receivers array', async function () {
+    const [withdrawer] = await ethers.getSigners();
+    const withdrawerAddress = await withdrawer.getAddress();
+    const maxReceiverBalance = parseEther('1');
+    const topUpAmount = parseEther('0.1');
+    const receiverAddress = withdrawerAddress;
+
+    const TopUp = await ethers.getContractFactory('TopUp');
+
+    await expect(
+      TopUp.deploy(withdrawerAddress, maxReceiverBalance, topUpAmount, [])
+    ).to.be.revertedWithCustomError(TopUp, 'NotEnoughReceivers');
+  });
+
   context('with a topup contract deployed', async function () {
     beforeEach(async function () {
       ({
