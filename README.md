@@ -20,3 +20,15 @@ This smart contract allows for an automated process to drip funds to relayer wal
 1. `pnpm install`
 2. `pnpm hardhat test`
 3. `pnpm hardhat coverage` // should be 100%
+
+## Threat model
+
+1. An attacker might compromise the `withdrawAddress`.
+2. An attacker might compromise a `receiveAddress` (or the relayer api key) and drain the balance one `topUp` at a time.
+3. An attacker might try to circumvent validation on `withdraw` or `topUp` to send funds to their own account.
+
+## Threat Mitigation
+
+1. The `withdrawAddress` should be a secure multi-sig
+2. Enforce relayer policy such that relayers can only interact with allowlisted addresses. Set up monitoring for high rate of top ups. Use KMS to store relayer API keys.
+3. Acheive 100% test coverage
