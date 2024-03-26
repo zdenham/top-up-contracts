@@ -14,6 +14,9 @@ async function deployTopUpFixture() {
   const otherAddress = await otherAccount.getAddress();
   const receiverAddress = await receiver.getAddress();
 
+  // set the receiver balance to zero with hardhat
+  await ethers.provider.send('hardhat_setBalance', [receiverAddress, '0x0']);
+
   const TopUp = await ethers.getContractFactory('TopUp');
 
   const topUp = await TopUp.deploy(
@@ -48,7 +51,6 @@ describe('TopUp', function () {
   let topUp: TopUp;
   let withdrawer: Signer;
   let otherAccount: Signer;
-  let receiver: Signer;
   let topUpAmount: bigint;
   let initialContractBalance: bigint;
   let withdrawerAddress: string;
@@ -60,7 +62,6 @@ describe('TopUp', function () {
         topUp,
         withdrawer,
         otherAccount,
-        receiver,
         topUpAmount,
         initialContractBalance,
         withdrawerAddress,
@@ -76,7 +77,7 @@ describe('TopUp', function () {
       );
 
       await expect(topUp.topUp(receiverAddress))
-        .to.emit(topUp, 'TopUpReceive')
+        .to.emit(topUp, 'TopUpSent')
         .withArgs(receiverAddress);
 
       // The receiver's balance should increase by the topUpAmount
@@ -137,6 +138,21 @@ describe('TopUp', function () {
         otherTopUp,
         'NotWithdrawAddress'
       );
+    });
+
+    it('should reflect if a receiver is a receiver', async function () {
+      expect(await topUp.isReceiverAddress(receiverAddress)).to.be.true;
+      expect(await topUp.isReceiverAddress(otherAddress)).to.be.false;
+    });
+
+    it('should emit a deposit event when ether is sent to the contract', async function () {
+      const depositAmount = parseEther('0.1');
+      const topUpAddress = await topUp.getAddress();
+      await expect(
+        withdrawer.sendTransaction({ to: topUpAddress, value: depositAmount })
+      )
+        .to.emit(topUp, 'DepositReceived')
+        .withArgs(withdrawerAddress, depositAmount);
     });
   });
 });

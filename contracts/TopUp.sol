@@ -2,15 +2,19 @@
 pragma solidity ^0.8.8;
 
 contract TopUp {
+    // State variables
     address payable public withdrawAddress;
     uint256 public maxReceiverBalance;
     uint256 public topUpAmount;
 
     mapping (address => bool) isReceiver;
 
+    // Events
     event Withdrawal(uint indexed amount);
-    event TopUpReceive(address indexed receiver);
+    event TopUpSent(address indexed receiver);
+    event DepositReceived(address indexed sender, uint indexed amount);
 
+    // Errors
     error NotEnoughReceivers();
     error ZeroValueForbidden();
     error NotReceiver();
@@ -20,10 +24,10 @@ contract TopUp {
     constructor(address payable _withdrawAddress, uint256 _maxReceiverBalance, uint256 _topUpAmount, address[] memory _receivers) {
         withdrawAddress = _withdrawAddress;
 
-        if(maxReceiverBalance == 0) revert ZeroValueForbidden();
+        if(_maxReceiverBalance == 0) revert ZeroValueForbidden();
         maxReceiverBalance = _maxReceiverBalance;
 
-        if(topUpAmount == 0) revert ZeroValueForbidden();
+        if(_topUpAmount == 0) revert ZeroValueForbidden();
         topUpAmount = _topUpAmount;
 
         if(_receivers.length == 0) revert NotEnoughReceivers();
@@ -33,11 +37,11 @@ contract TopUp {
         }
     }
 
-    function topUp(address payable _receiver) public payable {
+    function topUp(address payable _receiver) public {
         if(!isReceiver[_receiver]) revert NotReceiver();
         if(_receiver.balance >= maxReceiverBalance) revert ReceiverBalanceTooHigh();
 
-        emit TopUpReceive(_receiver);
+        emit TopUpSent(_receiver);
         _receiver.transfer(topUpAmount);
     }
 
@@ -51,5 +55,10 @@ contract TopUp {
 
     function isReceiverAddress(address _receiver) public view returns (bool) {
         return isReceiver[_receiver];
+    }
+
+    receive() external payable { 
+        // Fallback function
+        emit DepositReceived(msg.sender, msg.value);
     }
 }
