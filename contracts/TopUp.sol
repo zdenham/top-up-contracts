@@ -20,6 +20,7 @@ contract TopUp {
     error NotReceiver();
     error ReceiverBalanceTooHigh();
     error NotWithdrawAddress();
+    error TopUpAmountTooHigh();
     
     constructor(address payable _withdrawAddress, uint256 _maxReceiverBalance, uint256 _topUpAmount, address[] memory _receivers) {
         withdrawAddress = _withdrawAddress;
@@ -41,12 +42,13 @@ contract TopUp {
      * @param _receiver The address of the receiver. Must be eligible to receive top-ups.
      * @dev eligible receivers are set in the constructor and must have a balance lower than maxReceiverBalance.
      */
-    function topUp(address payable _receiver) public {
+    function topUp(address payable _receiver, uint256 amount) public {
+        if(amount > topUpAmount) revert TopUpAmountTooHigh();
         if(!isReceiver[_receiver]) revert NotReceiver();
         if(_receiver.balance >= maxReceiverBalance) revert ReceiverBalanceTooHigh();
 
         emit TopUpSent(_receiver);
-        _receiver.transfer(topUpAmount);
+        _receiver.transfer(amount);
     }
 
     function withdraw() public {

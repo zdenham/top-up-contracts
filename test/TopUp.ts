@@ -122,7 +122,7 @@ describe('TopUp', function () {
         topUpAmount
       );
 
-      await expect(topUp.topUp(receiverAddress))
+      await expect(topUp.topUp(receiverAddress, topUpAmount))
         .to.emit(topUp, 'TopUpSent')
         .withArgs(receiverAddress);
 
@@ -141,18 +141,16 @@ describe('TopUp', function () {
       });
 
       // Attempting a top-up should fail
-      await expect(topUp.topUp(receiverAddress)).to.be.revertedWithCustomError(
-        topUp,
-        'ReceiverBalanceTooHigh'
-      );
+      await expect(
+        topUp.topUp(receiverAddress, topUpAmount)
+      ).to.be.revertedWithCustomError(topUp, 'ReceiverBalanceTooHigh');
     });
 
     it('should fail to top up an invalid receiver', async function () {
       // Attempting to top-up an address not specified as a receiver should fail
-      await expect(topUp.topUp(otherAddress)).to.be.revertedWithCustomError(
-        topUp,
-        'NotReceiver'
-      );
+      await expect(
+        topUp.topUp(otherAddress, topUpAmount)
+      ).to.be.revertedWithCustomError(topUp, 'NotReceiver');
     });
 
     it('should allow the withdrawAddress to withdraw', async function () {
@@ -199,6 +197,19 @@ describe('TopUp', function () {
       )
         .to.emit(topUp, 'DepositReceived')
         .withArgs(withdrawerAddress, depositAmount);
+    });
+
+    it('should fail to top up greater than the top up amount', async function () {
+      const moreThanTopUpAmount = parseEther('0.2');
+      await expect(
+        topUp.topUp(receiverAddress, moreThanTopUpAmount)
+      ).to.be.revertedWithCustomError(topUp, 'TopUpAmountTooHigh');
+    });
+
+    it('should top top up less than the top up amount', async function () {
+      const lessThanTopUpAmount = parseEther('0.05');
+      await expect(topUp.topUp(receiverAddress, lessThanTopUpAmount)).to.not.be
+        .reverted;
     });
 
     it('should reflect the public varialbes correctly', async function () {
