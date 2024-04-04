@@ -35,6 +35,7 @@ const config: HardhatUserConfig = {
     gasPrice: 21,
   },
   etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
     customChains: [
       {
         network: 'avalanche',
